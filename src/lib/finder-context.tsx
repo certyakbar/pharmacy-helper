@@ -204,6 +204,18 @@ export function reconcileWithCatalogue(prev: State, ok: BootstrapOk): State {
   };
 }
 
+/** Pure reducer used by resetAll. Clears the customer journey while
+ *  retaining the currently-attached catalogue version so useProductSearch
+ *  stays enabled for the next journey without depending on bootstrap to
+ *  re-emit. */
+export function resetForNewJourney(prev: State): State {
+  return {
+    ...initialFinderState,
+    catalogueVersionId: prev.catalogueVersionId,
+    bannerDismissed: true,
+  };
+}
+
 export function FinderProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<State>(initial);
   const [hydrated, setHydrated] = useState(false);
