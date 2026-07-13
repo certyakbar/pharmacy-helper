@@ -1298,8 +1298,8 @@ export type Database = {
         Args: { _notes?: string; _store: string; _target_version: string }
         Returns: string
       }
-      staff_open_handover: {
-        Args: { _code: string; _store: string }
+      staff_open_handover_by_hash: {
+        Args: { _code_hash: string; _store: string }
         Returns: Json
       }
     }
