@@ -23,23 +23,22 @@ const openHandoverInput = z.object({
   code: z.string().min(1).max(64),
 });
 
-type StaffOpenHandoverResult =
+// Nested handover / session shapes are opaque JSON returned by the DB RPC.
+// Any-typed nested objects keep TanStack's serializer happy without hiding
+// the discriminant on `status`.
+export type StaffOpenHandoverResult =
   | { status: "not_authorised" }
   | { status: "not_found" }
   | { status: "expired" }
   | { status: "not_active" }
   | { status: "rate_limited"; retry_after_seconds: number }
-  | {
-      status: "ok";
-      newly_opened: boolean;
-      handover: Record<string, unknown>;
-      session: Record<string, unknown>;
-    };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  | { status: "ok"; newly_opened: boolean; handover: any; session: any };
 
 export const openHandover = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => openHandoverInput.parse(input))
-  .handler(async ({ data, context }): Promise<StaffOpenHandoverResult> => {
+  .handler(async ({ data, context }) => {
     // Normalise + hash on the server. If the code is unusable we still call
     // the RPC with a deterministic invalid-shape marker so the DB records the
     // failed attempt in its audit log. The DB's own shape validator will
@@ -47,12 +46,11 @@ export const openHandover = createServerFn({ method: "POST" })
     let codeHash: string;
     try {
       const normalised = normaliseHandoverCode(data.code);
-      // Lazy import so the pepper env var is read on the server only.
       const { computeHandoverCodeHash } = await import("./handover.server");
       codeHash = computeHandoverCodeHash(normalised);
     } catch (err) {
       if (err instanceof InvalidHandoverCodeError) {
-        codeHash = "invalid-shape"; // fails the DB's [0-9a-f]{64} regex → not_found + audit
+        codeHash = "invalid-shape"; // fails the DB's [0-9a-f]{64} regex -> not_found + audit
       } else {
         throw err;
       }
