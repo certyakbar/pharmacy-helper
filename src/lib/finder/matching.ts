@@ -21,7 +21,6 @@ import type {
   DisplayGroup,
   DisplayGroupMatch,
   MatchReasonEntry,
-  ProductDisplayGroupEdge,
   ProductMatch,
   SearchOk,
   SearchRequest,
@@ -39,12 +38,16 @@ export class UnknownSymptomError extends Error {
   }
 }
 
+// Product→display-group membership is derived from the immutable snapshot
+// (catalogue_version_items.display_group_codes) resolved against the active
+// customer_display_groups. The mutable product_display_group_mappings table
+// is intentionally NOT part of MatcherInput — a published catalogue must not
+// shift when canonical mappings are later edited.
 export interface MatcherInput {
   request: SearchRequest;
   symptoms: readonly Symptom[];
   displayGroups: readonly DisplayGroup[];
   items: readonly CatalogueItem[];
-  productDisplayGroupEdges: readonly ProductDisplayGroupEdge[];
   symptomDisplayGroupEdges: readonly SymptomDisplayGroupEdge[];
   catalogueVersion: CatalogueVersionMeta;
   generatedAt: string;
