@@ -1275,16 +1275,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      staff_lookup_handover: {
+      catalogue_approver_decide_import: {
+        Args: { _decision: string; _error_summary?: string; _import: string }
+        Returns: undefined
+      }
+      catalogue_editor_update_import: {
+        Args: {
+          _error_summary?: string
+          _import: string
+          _invalid_rows?: number
+          _status: Database["public"]["Enums"]["catalogue_import_status"]
+          _total_rows?: number
+          _valid_rows?: number
+        }
+        Returns: undefined
+      }
+      publish_catalogue_version: {
+        Args: { _notes?: string; _store: string; _version: string }
+        Returns: string
+      }
+      rollback_catalogue_publication: {
+        Args: { _notes?: string; _store: string; _target_version: string }
+        Returns: string
+      }
+      staff_open_handover: {
         Args: { _code: string; _store: string }
-        Returns: {
-          expires_at: string
-          handover_code_masked: string
-          handover_id: string
-          requested_at: string
-          session_id: string
-          status: Database["public"]["Enums"]["handover_status"]
-        }[]
+        Returns: Json
       }
     }
     Enums: {
