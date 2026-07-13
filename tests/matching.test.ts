@@ -6,7 +6,6 @@ import type {
   CatalogueItem,
   CatalogueVersionMeta,
   DisplayGroup,
-  ProductDisplayGroupEdge,
   SearchRequest,
   Symptom,
   SymptomDisplayGroupEdge,
