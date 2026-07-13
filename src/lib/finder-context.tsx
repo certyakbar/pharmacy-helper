@@ -204,6 +204,18 @@ export function reconcileWithCatalogue(prev: State, ok: BootstrapOk): State {
   };
 }
 
+/** Pure reducer used by resetAll. Clears the customer journey while
+ *  retaining the currently-attached catalogue version so useProductSearch
+ *  stays enabled for the next journey without depending on bootstrap to
+ *  re-emit. */
+export function resetForNewJourney(prev: State): State {
+  return {
+    ...initialFinderState,
+    catalogueVersionId: prev.catalogueVersionId,
+    bannerDismissed: true,
+  };
+}
+
 export function FinderProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<State>(initial);
   const [hydrated, setHydrated] = useState(false);
@@ -331,7 +343,11 @@ export function FinderProvider({ children }: { children: ReactNode }) {
   );
 
   const resetAll = useCallback(() => {
-    setState({ ...initial, bannerDismissed: true });
+    // Preserve the currently-attached catalogue version so a second journey
+    // can begin immediately without waiting for bootstrap to change. The
+    // reconcile ref already matches this version, so it will not be
+    // re-cleared by the reconcile effect.
+    setState((prev) => resetForNewJourney(prev));
     try {
       sessionStorage.removeItem(STORAGE_KEY);
     } catch {
