@@ -331,7 +331,15 @@ export function FinderProvider({ children }: { children: ReactNode }) {
   );
 
   const resetAll = useCallback(() => {
-    setState({ ...initial, bannerDismissed: true });
+    // Preserve the currently-attached catalogue version so a second journey
+    // can begin immediately without waiting for bootstrap to change. The
+    // reconcile ref already matches this version, so it will not be
+    // re-cleared by the reconcile effect.
+    setState((prev) => ({
+      ...initial,
+      catalogueVersionId: prev.catalogueVersionId,
+      bannerDismissed: true,
+    }));
     try {
       sessionStorage.removeItem(STORAGE_KEY);
     } catch {
