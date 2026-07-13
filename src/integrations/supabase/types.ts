@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           actor_user_id: string | null
           created_at: string
+          dedupe_key: string | null
           entity_id: string | null
           entity_type: string
           event_type: string
@@ -29,6 +30,7 @@ export type Database = {
         Insert: {
           actor_user_id?: string | null
           created_at?: string
+          dedupe_key?: string | null
           entity_id?: string | null
           entity_type: string
           event_type: string
@@ -40,6 +42,7 @@ export type Database = {
         Update: {
           actor_user_id?: string | null
           created_at?: string
+          dedupe_key?: string | null
           entity_id?: string | null
           entity_type?: string
           event_type?: string
@@ -260,16 +263,26 @@ export type Database = {
       }
       catalogue_version_items: {
         Row: {
+          active_ingredient: string
           aisle: string | null
           available_for_display: boolean
           bay: string | null
+          brand_name: string | null
           catalogue_version_id: string
           created_at: string
           currency: string
+          customer_summary: string | null
+          display_group_codes: string[]
+          drowsiness_level: Database["public"]["Enums"]["drowsiness_level"]
+          formulation: Database["public"]["Enums"]["formulation_type"]
           id: string
+          image_url: string | null
+          pack_size: string
           price: number
           product_id: string
+          product_name: string
           promotional_price: number | null
+          requires_staff_help: boolean
           retailer_image_url: string | null
           retailer_product_name: string | null
           retailer_sku: string
@@ -278,18 +291,32 @@ export type Database = {
           stock_quantity: number
           stock_status: Database["public"]["Enums"]["stock_status"]
           store_id: string
+          strength: string | null
+          treatment_group_code: string | null
+          treatment_group_name: string | null
+          warning_text: string | null
         }
         Insert: {
+          active_ingredient: string
           aisle?: string | null
           available_for_display?: boolean
           bay?: string | null
+          brand_name?: string | null
           catalogue_version_id: string
           created_at?: string
           currency?: string
+          customer_summary?: string | null
+          display_group_codes: string[]
+          drowsiness_level: Database["public"]["Enums"]["drowsiness_level"]
+          formulation: Database["public"]["Enums"]["formulation_type"]
           id?: string
+          image_url?: string | null
+          pack_size: string
           price: number
           product_id: string
+          product_name: string
           promotional_price?: number | null
+          requires_staff_help: boolean
           retailer_image_url?: string | null
           retailer_product_name?: string | null
           retailer_sku: string
@@ -298,18 +325,32 @@ export type Database = {
           stock_quantity?: number
           stock_status: Database["public"]["Enums"]["stock_status"]
           store_id: string
+          strength?: string | null
+          treatment_group_code?: string | null
+          treatment_group_name?: string | null
+          warning_text?: string | null
         }
         Update: {
+          active_ingredient?: string
           aisle?: string | null
           available_for_display?: boolean
           bay?: string | null
+          brand_name?: string | null
           catalogue_version_id?: string
           created_at?: string
           currency?: string
+          customer_summary?: string | null
+          display_group_codes?: string[]
+          drowsiness_level?: Database["public"]["Enums"]["drowsiness_level"]
+          formulation?: Database["public"]["Enums"]["formulation_type"]
           id?: string
+          image_url?: string | null
+          pack_size?: string
           price?: number
           product_id?: string
+          product_name?: string
           promotional_price?: number | null
+          requires_staff_help?: boolean
           retailer_image_url?: string | null
           retailer_product_name?: string | null
           retailer_sku?: string
@@ -318,6 +359,10 @@ export type Database = {
           stock_quantity?: number
           stock_status?: Database["public"]["Enums"]["stock_status"]
           store_id?: string
+          strength?: string | null
+          treatment_group_code?: string | null
+          treatment_group_name?: string | null
+          warning_text?: string | null
         }
         Relationships: [
           {
@@ -538,8 +583,8 @@ export type Database = {
         Row: {
           completed_at: string | null
           expires_at: string
-          handover_code_display: string
           handover_code_hash: string
+          handover_code_masked: string | null
           id: string
           opened_at: string | null
           opened_by: string | null
@@ -551,8 +596,8 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           expires_at?: string
-          handover_code_display: string
           handover_code_hash: string
+          handover_code_masked?: string | null
           id?: string
           opened_at?: string | null
           opened_by?: string | null
@@ -564,8 +609,8 @@ export type Database = {
         Update: {
           completed_at?: string | null
           expires_at?: string
-          handover_code_display?: string
           handover_code_hash?: string
+          handover_code_masked?: string | null
           id?: string
           opened_at?: string | null
           opened_by?: string | null
@@ -1057,33 +1102,45 @@ export type Database = {
       }
       stores: {
         Row: {
-          address: string | null
+          address_line_1: string | null
+          address_line_2: string | null
+          city: string | null
+          country_code: string | null
           created_at: string
           id: string
           name: string
           organisation_id: string
+          postcode: string | null
           status: Database["public"]["Enums"]["entity_status"]
           store_code: string
           timezone: string
           updated_at: string
         }
         Insert: {
-          address?: string | null
+          address_line_1?: string | null
+          address_line_2?: string | null
+          city?: string | null
+          country_code?: string | null
           created_at?: string
           id?: string
           name: string
           organisation_id: string
+          postcode?: string | null
           status?: Database["public"]["Enums"]["entity_status"]
           store_code: string
           timezone?: string
           updated_at?: string
         }
         Update: {
-          address?: string | null
+          address_line_1?: string | null
+          address_line_2?: string | null
+          city?: string | null
+          country_code?: string | null
           created_at?: string
           id?: string
           name?: string
           organisation_id?: string
+          postcode?: string | null
           status?: Database["public"]["Enums"]["entity_status"]
           store_code?: string
           timezone?: string
@@ -1218,32 +1275,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      current_staff_profile_id: { Args: never; Returns: string }
-      has_org_membership: {
-        Args: { _org: string; _user: string }
-        Returns: boolean
+      staff_lookup_handover: {
+        Args: { _code: string; _store: string }
+        Returns: {
+          expires_at: string
+          handover_code_masked: string
+          handover_id: string
+          requested_at: string
+          session_id: string
+          status: Database["public"]["Enums"]["handover_status"]
+        }[]
       }
-      has_org_role: {
-        Args: {
-          _org: string
-          _role: Database["public"]["Enums"]["app_role"]
-          _user: string
-        }
-        Returns: boolean
-      }
-      has_store_membership: {
-        Args: { _store: string; _user: string }
-        Returns: boolean
-      }
-      has_store_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _store: string
-          _user: string
-        }
-        Returns: boolean
-      }
-      is_platform_admin: { Args: { _user: string }; Returns: boolean }
     }
     Enums: {
       app_role:
