@@ -14,6 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
+      customer_display_groups: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          customer_description: string | null
+          display_order: number
+          icon: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          customer_description?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          customer_description?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      kiosk_devices: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          device_token_hash: string
+          id: string
+          label: string
+          last_seen_at: string | null
+          organisation_id: string
+          status: Database["public"]["Enums"]["kiosk_status"]
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          device_token_hash: string
+          id?: string
+          label: string
+          last_seen_at?: string | null
+          organisation_id: string
+          status?: Database["public"]["Enums"]["kiosk_status"]
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          device_token_hash?: string
+          id?: string
+          label?: string
+          last_seen_at?: string | null
+          organisation_id?: string
+          status?: Database["public"]["Enums"]["kiosk_status"]
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kiosk_devices_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kiosk_devices_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organisation_memberships: {
         Row: {
           created_at: string
@@ -85,6 +175,119 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      product_display_group_mappings: {
+        Row: {
+          active: boolean
+          created_at: string
+          display_group_id: string
+          id: string
+          product_id: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          display_group_id: string
+          id?: string
+          product_id: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          display_group_id?: string
+          id?: string
+          product_id?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_display_group_mappings_display_group_id_fkey"
+            columns: ["display_group_id"]
+            isOneToOne: false
+            referencedRelation: "customer_display_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_display_group_mappings_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          active: boolean
+          active_ingredient: string
+          brand_name: string | null
+          created_at: string
+          customer_summary: string | null
+          drowsiness_level: Database["public"]["Enums"]["drowsiness_level"]
+          formulation: Database["public"]["Enums"]["formulation_type"]
+          gtin: string | null
+          id: string
+          image_url: string | null
+          pack_size: string
+          product_name: string
+          requires_staff_help: boolean
+          strength: string | null
+          treatment_group_id: string | null
+          updated_at: string
+          warning_text: string | null
+        }
+        Insert: {
+          active?: boolean
+          active_ingredient: string
+          brand_name?: string | null
+          created_at?: string
+          customer_summary?: string | null
+          drowsiness_level?: Database["public"]["Enums"]["drowsiness_level"]
+          formulation: Database["public"]["Enums"]["formulation_type"]
+          gtin?: string | null
+          id?: string
+          image_url?: string | null
+          pack_size: string
+          product_name: string
+          requires_staff_help?: boolean
+          strength?: string | null
+          treatment_group_id?: string | null
+          updated_at?: string
+          warning_text?: string | null
+        }
+        Update: {
+          active?: boolean
+          active_ingredient?: string
+          brand_name?: string | null
+          created_at?: string
+          customer_summary?: string | null
+          drowsiness_level?: Database["public"]["Enums"]["drowsiness_level"]
+          formulation?: Database["public"]["Enums"]["formulation_type"]
+          gtin?: string | null
+          id?: string
+          image_url?: string | null
+          pack_size?: string
+          product_name?: string
+          requires_staff_help?: boolean
+          strength?: string | null
+          treatment_group_id?: string | null
+          updated_at?: string
+          warning_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_treatment_group_id_fkey"
+            columns: ["treatment_group_id"]
+            isOneToOne: false
+            referencedRelation: "treatment_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       staff_profiles: {
         Row: {
@@ -158,6 +361,84 @@ export type Database = {
           },
         ]
       }
+      store_products: {
+        Row: {
+          aisle: string | null
+          available_for_display: boolean
+          bay: string | null
+          created_at: string
+          currency: string
+          data_last_updated_at: string
+          id: string
+          price: number
+          product_id: string
+          promotional_price: number | null
+          retailer_image_url: string | null
+          retailer_product_name: string | null
+          retailer_sku: string
+          shelf: string | null
+          stock_quantity: number
+          stock_status: Database["public"]["Enums"]["stock_status"]
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          aisle?: string | null
+          available_for_display?: boolean
+          bay?: string | null
+          created_at?: string
+          currency?: string
+          data_last_updated_at?: string
+          id?: string
+          price: number
+          product_id: string
+          promotional_price?: number | null
+          retailer_image_url?: string | null
+          retailer_product_name?: string | null
+          retailer_sku: string
+          shelf?: string | null
+          stock_quantity?: number
+          stock_status?: Database["public"]["Enums"]["stock_status"]
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          aisle?: string | null
+          available_for_display?: boolean
+          bay?: string | null
+          created_at?: string
+          currency?: string
+          data_last_updated_at?: string
+          id?: string
+          price?: number
+          product_id?: string
+          promotional_price?: number | null
+          retailer_image_url?: string | null
+          retailer_product_name?: string | null
+          retailer_sku?: string
+          shelf?: string | null
+          stock_quantity?: number
+          stock_status?: Database["public"]["Enums"]["stock_status"]
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_products_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stores: {
         Row: {
           address: string | null
@@ -202,6 +483,120 @@ export type Database = {
           },
         ]
       }
+      symptom_display_group_mappings: {
+        Row: {
+          active: boolean
+          created_at: string
+          display_group_id: string
+          id: string
+          relevance_weight: number
+          symptom_id: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          display_group_id: string
+          id?: string
+          relevance_weight?: number
+          symptom_id: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          display_group_id?: string
+          id?: string
+          relevance_weight?: number
+          symptom_id?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "symptom_display_group_mappings_display_group_id_fkey"
+            columns: ["display_group_id"]
+            isOneToOne: false
+            referencedRelation: "customer_display_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "symptom_display_group_mappings_symptom_id_fkey"
+            columns: ["symptom_id"]
+            isOneToOne: false
+            referencedRelation: "symptoms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      symptoms: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          customer_description: string | null
+          display_order: number
+          icon: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          customer_description?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          customer_description?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      treatment_groups: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -241,7 +636,22 @@ export type Database = {
         | "catalogue_editor"
         | "store_manager"
         | "pharmacy_staff"
+      drowsiness_level: "none" | "low" | "moderate" | "high"
       entity_status: "active" | "inactive" | "archived"
+      formulation_type:
+        | "tablet"
+        | "capsule"
+        | "oral_liquid"
+        | "nasal_spray"
+        | "nasal_drops"
+        | "eye_drops"
+        | "cream"
+        | "ointment"
+        | "lozenge"
+        | "powder"
+        | "other"
+      kiosk_status: "active" | "suspended" | "retired"
+      stock_status: "in_stock" | "low_stock" | "out_of_stock" | "ask_staff"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -376,7 +786,23 @@ export const Constants = {
         "store_manager",
         "pharmacy_staff",
       ],
+      drowsiness_level: ["none", "low", "moderate", "high"],
       entity_status: ["active", "inactive", "archived"],
+      formulation_type: [
+        "tablet",
+        "capsule",
+        "oral_liquid",
+        "nasal_spray",
+        "nasal_drops",
+        "eye_drops",
+        "cream",
+        "ointment",
+        "lozenge",
+        "powder",
+        "other",
+      ],
+      kiosk_status: ["active", "suspended", "retired"],
+      stock_status: ["in_stock", "low_stock", "out_of_stock", "ask_staff"],
     },
   },
 } as const
