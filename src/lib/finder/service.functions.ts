@@ -58,7 +58,6 @@ export const searchProducts = createServerFn({ method: "POST" })
         displayGroups: snapshot.displayGroups,
         items: snapshot.items,
         symptomDisplayGroupEdges: snapshot.symptomDisplayGroupEdges,
-        symptomDisplayGroupEdges: snapshot.symptomDisplayGroupEdges,
         catalogueVersion: snapshot.catalogueVersion,
         generatedAt: snapshot.generatedAt,
       });
