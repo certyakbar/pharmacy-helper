@@ -347,11 +347,7 @@ export function FinderProvider({ children }: { children: ReactNode }) {
     // can begin immediately without waiting for bootstrap to change. The
     // reconcile ref already matches this version, so it will not be
     // re-cleared by the reconcile effect.
-    setState((prev) => ({
-      ...initial,
-      catalogueVersionId: prev.catalogueVersionId,
-      bannerDismissed: true,
-    }));
+    setState((prev) => resetForNewJourney(prev));
     try {
       sessionStorage.removeItem(STORAGE_KEY);
     } catch {
