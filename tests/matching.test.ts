@@ -105,7 +105,6 @@ const base = {
   symptoms,
   displayGroups: groups,
   items,
-  productDisplayGroupEdges: pdgm,
   symptomDisplayGroupEdges: sdgm,
   catalogueVersion,
   generatedAt: "2026-01-03T00:00:00Z",
