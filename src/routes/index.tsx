@@ -1,24 +1,37 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { FinderProvider, useFinder } from "@/lib/finder-context";
+import { AppShell } from "@/components/finder/AppShell";
+import { Welcome } from "@/components/finder/Welcome";
+import { Symptoms } from "@/components/finder/Symptoms";
+import { Categories } from "@/components/finder/Categories";
+import { Products } from "@/components/finder/Products";
+import { ProductDetail } from "@/components/finder/ProductDetail";
+import { Compare } from "@/components/finder/Compare";
+import { PharmacyHelp } from "@/components/finder/PharmacyHelp";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <FinderProvider>
+      <AppShell>
+        <Screen />
+      </AppShell>
+    </FinderProvider>
   );
+}
+
+function Screen() {
+  const { step } = useFinder();
+  switch (step) {
+    case "welcome": return <Welcome />;
+    case "symptoms": return <Symptoms />;
+    case "categories": return <Categories />;
+    case "products": return <Products />;
+    case "detail": return <ProductDetail />;
+    case "compare": return <Compare />;
+    case "help": return <PharmacyHelp />;
+  }
 }
