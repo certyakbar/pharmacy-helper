@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import {
   initialFinderState,
   reconcileWithCatalogue,
+  resetForNewJourney,
   toCompareSnapshot,
   FINDER_STORAGE_KEY,
   type CompareSnapshot,
