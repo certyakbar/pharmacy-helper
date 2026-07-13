@@ -14,16 +14,234 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      organisation_memberships: {
+        Row: {
+          created_at: string
+          id: string
+          organisation_id: string
+          role: Database["public"]["Enums"]["app_role"]
+          staff_profile_id: string
+          status: Database["public"]["Enums"]["entity_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organisation_id: string
+          role: Database["public"]["Enums"]["app_role"]
+          staff_profile_id: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organisation_id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          staff_profile_id?: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organisation_memberships_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organisation_memberships_staff_profile_id_fkey"
+            columns: ["staff_profile_id"]
+            isOneToOne: false
+            referencedRelation: "staff_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organisations: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          status: Database["public"]["Enums"]["entity_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      staff_profiles: {
+        Row: {
+          auth_user_id: string
+          created_at: string
+          full_name: string
+          id: string
+          status: Database["public"]["Enums"]["entity_status"]
+          updated_at: string
+        }
+        Insert: {
+          auth_user_id: string
+          created_at?: string
+          full_name: string
+          id?: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          updated_at?: string
+        }
+        Update: {
+          auth_user_id?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      store_memberships: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          staff_profile_id: string
+          status: Database["public"]["Enums"]["entity_status"]
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          staff_profile_id: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          staff_profile_id?: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_memberships_staff_profile_id_fkey"
+            columns: ["staff_profile_id"]
+            isOneToOne: false
+            referencedRelation: "staff_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_memberships_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stores: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          name: string
+          organisation_id: string
+          status: Database["public"]["Enums"]["entity_status"]
+          store_code: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          organisation_id: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          store_code: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          organisation_id?: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          store_code?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stores_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_staff_profile_id: { Args: never; Returns: string }
+      has_org_membership: {
+        Args: { _org: string; _user: string }
+        Returns: boolean
+      }
+      has_org_role: {
+        Args: {
+          _org: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _user: string
+        }
+        Returns: boolean
+      }
+      has_store_membership: {
+        Args: { _store: string; _user: string }
+        Returns: boolean
+      }
+      has_store_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _store: string
+          _user: string
+        }
+        Returns: boolean
+      }
+      is_platform_admin: { Args: { _user: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "platform_admin"
+        | "catalogue_approver"
+        | "catalogue_editor"
+        | "store_manager"
+        | "pharmacy_staff"
+      entity_status: "active" | "inactive" | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +368,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "platform_admin",
+        "catalogue_approver",
+        "catalogue_editor",
+        "store_manager",
+        "pharmacy_staff",
+      ],
+      entity_status: ["active", "inactive", "archived"],
+    },
   },
 } as const
