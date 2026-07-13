@@ -58,7 +58,8 @@ export function useProductSearch(
       ? finderKeys.search(catalogueVersionId, req)
       : ["finder", "search", "disabled"],
     queryFn: () => searchProducts({ data: req! }),
-    placeholderData: (previous) => previous,
+    // Intentionally no placeholderData: previous results must disappear so the
+    // customer cannot act on stale products from a prior symptom/filter request.
     staleTime: 30_000,
     retry: 1,
   });
