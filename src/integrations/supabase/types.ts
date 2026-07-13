@@ -1290,6 +1290,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      finder_bootstrap: { Args: { _store: string }; Returns: Json }
+      finder_catalogue_snapshot: { Args: { _store: string }; Returns: Json }
+      finder_product_detail: {
+        Args: { _item: string; _store: string }
+        Returns: Json
+      }
       publish_catalogue_version: {
         Args: { _notes?: string; _store: string; _version: string }
         Returns: string
