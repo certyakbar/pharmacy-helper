@@ -75,7 +75,7 @@ export interface CompareSnapshot {
   catalogueVersionId: string;
 }
 
-interface State {
+export interface State {
   step: Step;
   previousStep: Step;
   symptomIds: string[];
@@ -89,6 +89,21 @@ interface State {
   catalogueVersionId: string | null;
   refreshNotice: boolean;
 }
+
+export const initialFinderState: State = {
+  step: "welcome",
+  previousStep: "welcome",
+  symptomIds: [],
+  displayGroupId: null,
+  detailId: null,
+  compareIds: [],
+  compareSnapshots: {},
+  filters: { formulation: "all", priceMax: null, inStockOnly: false },
+  sort: "best_match",
+  bannerDismissed: false,
+  catalogueVersionId: null,
+  refreshNotice: false,
+};
 
 interface Ctx extends State {
   bootstrap: BootstrapResponse | undefined;
@@ -150,7 +165,7 @@ function isBootstrapOk(b: BootstrapResponse | undefined): b is BootstrapOk {
 /** Apply catalogue-version invalidation: drop everything that references the
  *  old immutable snapshot, prune symptoms that no longer exist, and land the
  *  user on the categories screen with a refresh banner. */
-function reconcileWithCatalogue(prev: State, ok: BootstrapOk): State {
+export function reconcileWithCatalogue(prev: State, ok: BootstrapOk): State {
   const versionChanged =
     prev.catalogueVersionId !== null &&
     prev.catalogueVersionId !== ok.catalogue_version.id;
