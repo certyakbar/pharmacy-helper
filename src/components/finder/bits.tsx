@@ -1,23 +1,37 @@
+import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import {
-  Wind, Droplet, Ban, Sparkles, Eye, CloudDrizzle,
-  Pill, SprayCan, Package,
-} from "lucide-react";
-import type { StockStatus, SymptomId, CategoryId } from "@/lib/finder-data";
-import { SYMPTOMS, CATEGORIES } from "@/lib/finder-data";
+import { Package } from "lucide-react";
+
+import type { StockStatus } from "@/lib/finder/schemas";
+import { useFinder } from "@/lib/finder-context";
 import { cn } from "@/lib/utils";
 
-const ICONS: Record<string, LucideIcon> = {
-  Wind, Droplet, Ban, Sparkles, Eye, CloudDrizzle, Pill, SprayCan, Package,
-};
-
-export function DynIcon({ name, className }: { name: string; className?: string }) {
-  const I = ICONS[name] ?? Package;
+/** Dynamic lucide icon by name (bootstrap uses arbitrary icon names). */
+export function DynIcon({ name, className }: { name: string | null; className?: string }) {
+  const registry = LucideIcons as unknown as Record<string, LucideIcon>;
+  const I = (name && registry[name]) || Package;
   return <I className={className} strokeWidth={1.75} />;
 }
 
-export function SymptomChip({ id, active, onClick }: { id: SymptomId; active?: boolean; onClick?: () => void }) {
-  const s = SYMPTOMS.find((x) => x.id === id);
+/** Format a formulation enum value as a customer label. */
+export function formulationLabel(v: string): string {
+  return v
+    .split("_")
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+    .join(" ");
+}
+
+export function SymptomChip({
+  symptomId,
+  active,
+  onClick,
+}: {
+  symptomId: string;
+  active?: boolean;
+  onClick?: () => void;
+}) {
+  const { symptomsById } = useFinder();
+  const s = symptomsById.get(symptomId);
   if (!s) return null;
   const Comp = onClick ? "button" : "span";
   return (
@@ -31,35 +45,61 @@ export function SymptomChip({ id, active, onClick }: { id: SymptomId; active?: b
       )}
     >
       <DynIcon name={s.icon} className="h-3.5 w-3.5" />
-      {s.label}
+      {s.name}
     </Comp>
   );
 }
 
 export function StockBadge({ status, qty }: { status: StockStatus; qty?: number }) {
-  const map = {
-    "in-stock": { label: "In stock", cls: "bg-success/10 text-success border-success/30" },
-    "low-stock": { label: `Low stock${qty ? ` · ${qty} left` : ""}`, cls: "bg-warning/15 text-warning-foreground border-warning/40" },
-    "ask-staff": { label: "Ask staff", cls: "bg-accent/15 text-accent-foreground border-accent/30" },
-  } as const;
+  const map: Record<StockStatus, { label: string; cls: string }> = {
+    in_stock: { label: "In stock", cls: "bg-success/10 text-success border-success/30" },
+    low_stock: {
+      label: `Low stock${qty ? ` · ${qty} left` : ""}`,
+      cls: "bg-warning/15 text-warning-foreground border-warning/40",
+    },
+    out_of_stock: {
+      label: "Out of stock",
+      cls: "bg-muted text-muted-foreground border-border",
+    },
+    ask_staff: {
+      label: "Ask staff",
+      cls: "bg-accent/15 text-accent-foreground border-accent/30",
+    },
+  };
   const m = map[status];
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium", m.cls)}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+        m.cls,
+      )}
+    >
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
       {m.label}
     </span>
   );
 }
 
-export function ShelfLocation({ aisle, bay, shelf, className }: { aisle: number; bay: number; shelf: number; className?: string }) {
+export function ShelfLocation({
+  aisle,
+  bay,
+  shelf,
+  className,
+}: {
+  aisle: string | null;
+  bay: string | null;
+  shelf: string | null;
+  className?: string;
+}) {
+  if (!aisle && !bay && !shelf) return null;
   return (
-    <span className={cn("inline-flex items-center gap-1 text-xs text-muted-foreground", className)}>
+    <span
+      className={cn("inline-flex items-center gap-1 text-xs text-muted-foreground", className)}
+    >
       <Package className="h-3.5 w-3.5" />
-      Aisle {aisle} · Bay {bay} · Shelf {shelf}
+      {aisle && `Aisle ${aisle}`}
+      {bay && ` · Bay ${bay}`}
+      {shelf && ` · Shelf ${shelf}`}
     </span>
   );
-}
-
-export function categoryMeta(id: CategoryId) {
-  return CATEGORIES.find((c) => c.id === id)!;
 }
