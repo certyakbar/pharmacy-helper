@@ -189,3 +189,42 @@ describe("finderKeys.search", () => {
     expect(a).not.toEqual(e);
   });
 });
+
+describe("resetForNewJourney (Start Again / Finish Session)", () => {
+  it("preserves the currently-attached catalogue version so search stays enabled", () => {
+    // 1. First bootstrap attaches a catalogue version.
+    let s = reconcileWithCatalogue(initialFinderState, bootstrap(V1, [S1, S2]));
+    expect(s.catalogueVersionId).toBe(V1);
+
+    // 2. Customer selects symptoms, a category, and a compare item.
+    s = {
+      ...s,
+      symptomIds: [S1, S2],
+      displayGroupId: "00000000-0000-0000-0000-000000000c01",
+      detailId: IT,
+      compareIds: [IT],
+      compareSnapshots: { [IT]: snap },
+      step: "detail",
+      refreshNotice: false,
+    };
+
+    // 3. Reset (Start Again / Finish Session).
+    const reset = resetForNewJourney(s);
+    expect(reset.step).toBe("welcome");
+    expect(reset.symptomIds).toEqual([]);
+    expect(reset.displayGroupId).toBeNull();
+    expect(reset.detailId).toBeNull();
+    expect(reset.compareIds).toEqual([]);
+    expect(reset.compareSnapshots).toEqual({});
+    expect(reset.refreshNotice).toBe(false);
+    // Catalogue version must remain attached — do NOT depend on bootstrap changing.
+    expect(reset.catalogueVersionId).toBe(V1);
+
+    // 4. useProductSearch's `enabled` predicate is `!!request && !!catalogueVersionId`.
+    //    Simulate a second journey selecting a symptom, then confirm both are truthy.
+    const second = { ...reset, symptomIds: [S1] };
+    const requestReady = second.symptomIds.length > 0;
+    const searchEnabled = requestReady && !!second.catalogueVersionId;
+    expect(searchEnabled).toBe(true);
+  });
+});
