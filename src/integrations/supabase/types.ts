@@ -14,6 +14,388 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          organisation_id: string
+          store_id: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          organisation_id: string
+          store_id?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          organisation_id?: string
+          store_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_events_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_events_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      catalogue_import_rows: {
+        Row: {
+          catalogue_import_id: string
+          created_at: string
+          id: string
+          mapped_product_id: string | null
+          row_number: number
+          source_data: Json
+          source_product_id: string | null
+          validation_errors: Json | null
+          validation_status: Database["public"]["Enums"]["import_row_status"]
+        }
+        Insert: {
+          catalogue_import_id: string
+          created_at?: string
+          id?: string
+          mapped_product_id?: string | null
+          row_number: number
+          source_data: Json
+          source_product_id?: string | null
+          validation_errors?: Json | null
+          validation_status: Database["public"]["Enums"]["import_row_status"]
+        }
+        Update: {
+          catalogue_import_id?: string
+          created_at?: string
+          id?: string
+          mapped_product_id?: string | null
+          row_number?: number
+          source_data?: Json
+          source_product_id?: string | null
+          validation_errors?: Json | null
+          validation_status?: Database["public"]["Enums"]["import_row_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalogue_import_rows_catalogue_import_id_fkey"
+            columns: ["catalogue_import_id"]
+            isOneToOne: false
+            referencedRelation: "catalogue_imports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catalogue_import_rows_mapped_product_id_fkey"
+            columns: ["mapped_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      catalogue_imports: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          catalogue_version_id: string | null
+          created_at: string
+          error_summary: string | null
+          file_hash: string
+          file_size_bytes: number | null
+          filename: string
+          id: string
+          idempotency_key: string
+          invalid_rows: number
+          mime_type: string | null
+          organisation_id: string
+          published_at: string | null
+          source_system: string
+          status: Database["public"]["Enums"]["catalogue_import_status"]
+          store_id: string | null
+          total_rows: number
+          updated_at: string
+          uploaded_by: string | null
+          valid_rows: number
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          catalogue_version_id?: string | null
+          created_at?: string
+          error_summary?: string | null
+          file_hash: string
+          file_size_bytes?: number | null
+          filename: string
+          id?: string
+          idempotency_key: string
+          invalid_rows?: number
+          mime_type?: string | null
+          organisation_id: string
+          published_at?: string | null
+          source_system?: string
+          status?: Database["public"]["Enums"]["catalogue_import_status"]
+          store_id?: string | null
+          total_rows?: number
+          updated_at?: string
+          uploaded_by?: string | null
+          valid_rows?: number
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          catalogue_version_id?: string | null
+          created_at?: string
+          error_summary?: string | null
+          file_hash?: string
+          file_size_bytes?: number | null
+          filename?: string
+          id?: string
+          idempotency_key?: string
+          invalid_rows?: number
+          mime_type?: string | null
+          organisation_id?: string
+          published_at?: string | null
+          source_system?: string
+          status?: Database["public"]["Enums"]["catalogue_import_status"]
+          store_id?: string | null
+          total_rows?: number
+          updated_at?: string
+          uploaded_by?: string | null
+          valid_rows?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalogue_imports_catalogue_version_id_fkey"
+            columns: ["catalogue_version_id"]
+            isOneToOne: false
+            referencedRelation: "catalogue_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catalogue_imports_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catalogue_imports_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      catalogue_publications: {
+        Row: {
+          catalogue_version_id: string
+          id: string
+          is_rollback: boolean
+          notes: string | null
+          published_at: string
+          published_by: string | null
+          store_id: string
+          superseded_at: string | null
+        }
+        Insert: {
+          catalogue_version_id: string
+          id?: string
+          is_rollback?: boolean
+          notes?: string | null
+          published_at?: string
+          published_by?: string | null
+          store_id: string
+          superseded_at?: string | null
+        }
+        Update: {
+          catalogue_version_id?: string
+          id?: string
+          is_rollback?: boolean
+          notes?: string | null
+          published_at?: string
+          published_by?: string | null
+          store_id?: string
+          superseded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalogue_publications_catalogue_version_id_fkey"
+            columns: ["catalogue_version_id"]
+            isOneToOne: false
+            referencedRelation: "catalogue_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catalogue_publications_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      catalogue_version_items: {
+        Row: {
+          aisle: string | null
+          available_for_display: boolean
+          bay: string | null
+          catalogue_version_id: string
+          created_at: string
+          currency: string
+          id: string
+          price: number
+          product_id: string
+          promotional_price: number | null
+          retailer_image_url: string | null
+          retailer_product_name: string | null
+          retailer_sku: string
+          shelf: string | null
+          snapshot_data: Json | null
+          stock_quantity: number
+          stock_status: Database["public"]["Enums"]["stock_status"]
+          store_id: string
+        }
+        Insert: {
+          aisle?: string | null
+          available_for_display?: boolean
+          bay?: string | null
+          catalogue_version_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          price: number
+          product_id: string
+          promotional_price?: number | null
+          retailer_image_url?: string | null
+          retailer_product_name?: string | null
+          retailer_sku: string
+          shelf?: string | null
+          snapshot_data?: Json | null
+          stock_quantity?: number
+          stock_status: Database["public"]["Enums"]["stock_status"]
+          store_id: string
+        }
+        Update: {
+          aisle?: string | null
+          available_for_display?: boolean
+          bay?: string | null
+          catalogue_version_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          price?: number
+          product_id?: string
+          promotional_price?: number | null
+          retailer_image_url?: string | null
+          retailer_product_name?: string | null
+          retailer_sku?: string
+          shelf?: string | null
+          snapshot_data?: Json | null
+          stock_quantity?: number
+          stock_status?: Database["public"]["Enums"]["stock_status"]
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalogue_version_items_catalogue_version_id_fkey"
+            columns: ["catalogue_version_id"]
+            isOneToOne: false
+            referencedRelation: "catalogue_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catalogue_version_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catalogue_version_items_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      catalogue_versions: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          created_by: string | null
+          frozen_at: string | null
+          id: string
+          label: string | null
+          notes: string | null
+          organisation_id: string
+          status: Database["public"]["Enums"]["catalogue_version_status"]
+          updated_at: string
+          version_number: number
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          frozen_at?: string | null
+          id?: string
+          label?: string | null
+          notes?: string | null
+          organisation_id: string
+          status?: Database["public"]["Enums"]["catalogue_version_status"]
+          updated_at?: string
+          version_number: number
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          frozen_at?: string | null
+          id?: string
+          label?: string | null
+          notes?: string | null
+          organisation_id?: string
+          status?: Database["public"]["Enums"]["catalogue_version_status"]
+          updated_at?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalogue_versions_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_display_groups: {
         Row: {
           active: boolean
@@ -49,6 +431,165 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      customer_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          kiosk_device_id: string | null
+          last_activity_at: string
+          organisation_id: string
+          session_token_hash: string
+          status: Database["public"]["Enums"]["session_status"]
+          store_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          kiosk_device_id?: string | null
+          last_activity_at?: string
+          organisation_id: string
+          session_token_hash: string
+          status?: Database["public"]["Enums"]["session_status"]
+          store_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          kiosk_device_id?: string | null
+          last_activity_at?: string
+          organisation_id?: string
+          session_token_hash?: string
+          status?: Database["public"]["Enums"]["session_status"]
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_sessions_kiosk_device_id_fkey"
+            columns: ["kiosk_device_id"]
+            isOneToOne: false
+            referencedRelation: "kiosk_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_sessions_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_sessions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      handover_lookup_attempts: {
+        Row: {
+          actor_ip: unknown
+          actor_user_id: string | null
+          created_at: string
+          id: string
+          reason: string | null
+          store_id: string | null
+          submitted_code_hash: string
+          succeeded: boolean
+        }
+        Insert: {
+          actor_ip?: unknown
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          store_id?: string | null
+          submitted_code_hash: string
+          succeeded: boolean
+        }
+        Update: {
+          actor_ip?: unknown
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          store_id?: string | null
+          submitted_code_hash?: string
+          succeeded?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "handover_lookup_attempts_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      handovers: {
+        Row: {
+          completed_at: string | null
+          expires_at: string
+          handover_code_display: string
+          handover_code_hash: string
+          id: string
+          opened_at: string | null
+          opened_by: string | null
+          requested_at: string
+          session_id: string
+          status: Database["public"]["Enums"]["handover_status"]
+          store_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          expires_at?: string
+          handover_code_display: string
+          handover_code_hash: string
+          id?: string
+          opened_at?: string | null
+          opened_by?: string | null
+          requested_at?: string
+          session_id: string
+          status?: Database["public"]["Enums"]["handover_status"]
+          store_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          expires_at?: string
+          handover_code_display?: string
+          handover_code_hash?: string
+          id?: string
+          opened_at?: string | null
+          opened_by?: string | null
+          requested_at?: string
+          session_id?: string
+          status?: Database["public"]["Enums"]["handover_status"]
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "handovers_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "customer_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handovers_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       kiosk_devices: {
         Row: {
@@ -285,6 +826,81 @@ export type Database = {
             columns: ["treatment_group_id"]
             isOneToOne: false
             referencedRelation: "treatment_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_shortlist: {
+        Row: {
+          action_type: Database["public"]["Enums"]["shortlist_action"]
+          created_at: string
+          id: string
+          session_id: string
+          store_product_id: string
+        }
+        Insert: {
+          action_type: Database["public"]["Enums"]["shortlist_action"]
+          created_at?: string
+          id?: string
+          session_id: string
+          store_product_id: string
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["shortlist_action"]
+          created_at?: string
+          id?: string
+          session_id?: string
+          store_product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_shortlist_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "customer_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_shortlist_store_product_id_fkey"
+            columns: ["store_product_id"]
+            isOneToOne: false
+            referencedRelation: "store_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_symptoms: {
+        Row: {
+          created_at: string
+          id: string
+          session_id: string
+          symptom_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          session_id: string
+          symptom_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          session_id?: string
+          symptom_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_symptoms_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "customer_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_symptoms_symptom_id_fkey"
+            columns: ["symptom_id"]
+            isOneToOne: false
+            referencedRelation: "symptoms"
             referencedColumns: ["id"]
           },
         ]
@@ -636,6 +1252,19 @@ export type Database = {
         | "catalogue_editor"
         | "store_manager"
         | "pharmacy_staff"
+      catalogue_import_status:
+        | "uploaded"
+        | "validating"
+        | "validation_failed"
+        | "ready_for_review"
+        | "approved"
+        | "published"
+        | "rejected"
+      catalogue_version_status:
+        | "draft"
+        | "approved"
+        | "superseded"
+        | "rolled_back"
       drowsiness_level: "none" | "low" | "moderate" | "high"
       entity_status: "active" | "inactive" | "archived"
       formulation_type:
@@ -650,7 +1279,16 @@ export type Database = {
         | "lozenge"
         | "powder"
         | "other"
+      handover_status:
+        | "waiting"
+        | "opened"
+        | "completed"
+        | "expired"
+        | "cancelled"
+      import_row_status: "valid" | "invalid" | "skipped_duplicate"
       kiosk_status: "active" | "suspended" | "retired"
+      session_status: "active" | "handover_requested" | "completed" | "expired"
+      shortlist_action: "viewed" | "compared" | "shortlisted" | "removed"
       stock_status: "in_stock" | "low_stock" | "out_of_stock" | "ask_staff"
     }
     CompositeTypes: {
@@ -786,6 +1424,21 @@ export const Constants = {
         "store_manager",
         "pharmacy_staff",
       ],
+      catalogue_import_status: [
+        "uploaded",
+        "validating",
+        "validation_failed",
+        "ready_for_review",
+        "approved",
+        "published",
+        "rejected",
+      ],
+      catalogue_version_status: [
+        "draft",
+        "approved",
+        "superseded",
+        "rolled_back",
+      ],
       drowsiness_level: ["none", "low", "moderate", "high"],
       entity_status: ["active", "inactive", "archived"],
       formulation_type: [
@@ -801,7 +1454,17 @@ export const Constants = {
         "powder",
         "other",
       ],
+      handover_status: [
+        "waiting",
+        "opened",
+        "completed",
+        "expired",
+        "cancelled",
+      ],
+      import_row_status: ["valid", "invalid", "skipped_duplicate"],
       kiosk_status: ["active", "suspended", "retired"],
+      session_status: ["active", "handover_requested", "completed", "expired"],
+      shortlist_action: ["viewed", "compared", "shortlisted", "removed"],
       stock_status: ["in_stock", "low_stock", "out_of_stock", "ask_staff"],
     },
   },
