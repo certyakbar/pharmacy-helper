@@ -1,11 +1,10 @@
 // Server-only Supabase repository for the finder read RPCs.
 //
-// All catalogue reads happen through SECURITY DEFINER RPCs defined in the
-// Stage 2A migration. The repository uses the anon publishable key: the
-// kiosk is anonymous and the RPCs curate their own output.
-//
-// Never imported from client code — filename ends with `.server.ts`, which
-// the build blocks from the browser bundle.
+// The finder_* RPCs are SECURITY DEFINER and executable ONLY by service_role
+// (Stage 2A.1). The kiosk is anonymous in the browser; the trusted server
+// boundary is the TanStack server function, which resolves KIOSK_STORE_ID
+// server-side and then calls Supabase with the service-role key. This module
+// is filename-blocked from the client bundle (`.server.ts`).
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -15,7 +14,6 @@ import {
   catalogueVersionMetaSchema,
   displayGroupSchema,
   productDetailResponseSchema,
-  productDisplayGroupEdgeSchema,
   storeIdentitySchema,
   symptomDisplayGroupEdgeSchema,
   symptomSchema,
@@ -24,7 +22,6 @@ import {
   type CatalogueVersionMeta,
   type DisplayGroup,
   type ProductDetailResponse,
-  type ProductDisplayGroupEdge,
   type StoreIdentity,
   type Symptom,
   type SymptomDisplayGroupEdge,
@@ -37,10 +34,10 @@ function isNewApiKey(v: string) {
 
 function makeClient() {
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
     throw new Error(
-      "SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY missing — cannot reach the finder catalogue service.",
+      "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY missing — cannot reach the finder catalogue service. This key is server-only; never expose via VITE_ or the browser bundle.",
     );
   }
   return createClient(url, key, {
@@ -92,7 +89,6 @@ const snapshotWireSchema = z.discriminatedUnion("status", [
     store: storeIdentitySchema,
     catalogue_version: catalogueVersionMetaSchema,
     items: z.array(catalogueItemSchema),
-    product_display_group_mappings: z.array(productDisplayGroupEdgeSchema),
     symptom_display_group_mappings: z.array(symptomDisplayGroupEdgeSchema),
   }),
   z.object({
@@ -112,7 +108,6 @@ export type Snapshot =
       store: StoreIdentity;
       catalogueVersion: CatalogueVersionMeta;
       items: CatalogueItem[];
-      productDisplayGroupEdges: ProductDisplayGroupEdge[];
       symptomDisplayGroupEdges: SymptomDisplayGroupEdge[];
       symptoms: Symptom[];
       displayGroups: DisplayGroup[];
@@ -151,8 +146,6 @@ export async function fetchBootstrap(storeId: string): Promise<BootstrapResponse
     symptoms: parsed.symptoms,
     display_groups: parsed.display_groups,
     catalogue_version: parsed.catalogue_version,
-    // Formulations are derived from the enum, not from row data, so kiosk
-    // callers see the same set even before any product uses it.
     formulations: [
       "tablet",
       "capsule",
@@ -171,9 +164,6 @@ export async function fetchBootstrap(storeId: string): Promise<BootstrapResponse
 
 export async function fetchSnapshot(storeId: string): Promise<Snapshot> {
   const supabase = makeClient();
-  // The snapshot RPC is the single point of truth for matcher inputs; we
-  // still call bootstrap once so the matcher can validate symptoms and name
-  // display groups without a second read path.
   const [snapRes, bootstrap] = await Promise.all([
     supabase.rpc("finder_catalogue_snapshot", { _store: storeId }),
     fetchBootstrap(storeId),
@@ -206,7 +196,6 @@ export async function fetchSnapshot(storeId: string): Promise<Snapshot> {
     store: parsed.store,
     catalogueVersion: parsed.catalogue_version,
     items: parsed.items,
-    productDisplayGroupEdges: parsed.product_display_group_mappings,
     symptomDisplayGroupEdges: parsed.symptom_display_group_mappings,
     symptoms: bootstrap.symptoms,
     displayGroups: bootstrap.display_groups,

@@ -21,7 +21,6 @@ import type {
   DisplayGroup,
   DisplayGroupMatch,
   MatchReasonEntry,
-  ProductDisplayGroupEdge,
   ProductMatch,
   SearchOk,
   SearchRequest,
@@ -39,12 +38,16 @@ export class UnknownSymptomError extends Error {
   }
 }
 
+// Product→display-group membership is derived from the immutable snapshot
+// (catalogue_version_items.display_group_codes) resolved against the active
+// customer_display_groups. The mutable product_display_group_mappings table
+// is intentionally NOT part of MatcherInput — a published catalogue must not
+// shift when canonical mappings are later edited.
 export interface MatcherInput {
   request: SearchRequest;
   symptoms: readonly Symptom[];
   displayGroups: readonly DisplayGroup[];
   items: readonly CatalogueItem[];
-  productDisplayGroupEdges: readonly ProductDisplayGroupEdge[];
   symptomDisplayGroupEdges: readonly SymptomDisplayGroupEdge[];
   catalogueVersion: CatalogueVersionMeta;
   generatedAt: string;
@@ -84,7 +87,6 @@ export function runMatcher(input: MatcherInput): SearchOk {
     symptoms,
     displayGroups,
     items,
-    productDisplayGroupEdges,
     symptomDisplayGroupEdges,
     catalogueVersion,
     generatedAt,
@@ -97,15 +99,14 @@ export function runMatcher(input: MatcherInput): SearchOk {
   const selectedSymptomIds = new Set(request.symptomIds);
 
   const groupById = new Map(displayGroups.map((g) => [g.id, g]));
+  const groupIdByCode = new Map(displayGroups.map((g) => [g.code, g.id]));
 
   // 2. Resolve active S→G mappings for selected symptoms only.
-  //    Weight per group is summed across contributing selected symptoms.
-  //    Also record which of the selected symptoms contributed to each group.
   const groupWeight = new Map<string, number>();
   const groupSymptoms = new Map<string, Set<string>>();
   for (const edge of symptomDisplayGroupEdges) {
     if (!selectedSymptomIds.has(edge.symptom_id)) continue;
-    if (!groupById.has(edge.display_group_id)) continue; // group must be active
+    if (!groupById.has(edge.display_group_id)) continue;
     groupWeight.set(
       edge.display_group_id,
       (groupWeight.get(edge.display_group_id) ?? 0) + edge.relevance_weight,
@@ -117,42 +118,32 @@ export function runMatcher(input: MatcherInput): SearchOk {
     }
     bag.add(edge.symptom_id);
   }
-  // 3. Exclude groups with zero relevance to the selection.
+  // 3. Exclude groups with zero relevance.
   const relevantGroupIds = new Set(
-    Array.from(groupWeight.entries())
-      .filter(([, w]) => w > 0)
-      .map(([id]) => id),
+    Array.from(groupWeight.entries()).filter(([, w]) => w > 0).map(([id]) => id),
   );
 
-  // Optional filter: caller narrowed to a single display group.
   const groupFilter = request.displayGroupId
     ? new Set([request.displayGroupId])
     : relevantGroupIds;
 
-  // Index approved P→G edges.
-  const productGroups = new Map<string, Set<string>>();
-  for (const edge of productDisplayGroupEdges) {
-    let bag = productGroups.get(edge.product_id);
-    if (!bag) {
-      bag = new Set<string>();
-      productGroups.set(edge.product_id, bag);
-    }
-    bag.add(edge.display_group_id);
-  }
-
-  // 4-8. Score every catalogue item.
+  // 4-8. Score every catalogue item. Product→group membership comes from
+  // the item's immutable display_group_codes snapshot resolved against the
+  // active customer_display_groups. The mutable product_display_group_mappings
+  // table is intentionally not consulted.
   const matches: ProductMatch[] = [];
   for (const item of items) {
-    // 5. Restrict to products in at least one relevant (and optionally
-    //    filter-narrowed) group.
-    const productGroupIds = productGroups.get(item.product_id) ?? new Set<string>();
     const matchedGroupIds: string[] = [];
-    for (const gid of productGroupIds) {
+    for (const code of item.display_group_codes) {
+      const gid = groupIdByCode.get(code);
+      if (!gid) continue;
       if (!relevantGroupIds.has(gid)) continue;
       if (!groupFilter.has(gid)) continue;
       matchedGroupIds.push(gid);
     }
-    if (matchedGroupIds.length === 0) continue; // 6. Excluded — no approved relationship.
+    if (matchedGroupIds.length === 0) continue;
+
+
 
     // 8. Deterministic score + matched symptoms union + structured reason.
     let score = 0;

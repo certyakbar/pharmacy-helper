@@ -6,7 +6,6 @@ import type {
   CatalogueItem,
   CatalogueVersionMeta,
   DisplayGroup,
-  ProductDisplayGroupEdge,
   SearchRequest,
   Symptom,
   SymptomDisplayGroupEdge,
@@ -84,17 +83,11 @@ function item(overrides: Partial<CatalogueItem>): CatalogueItem {
 }
 
 const items: CatalogueItem[] = [
-  item({ id: "10000000-0000-0000-0000-000000000001", product_id: P.cetirizine, product_name: "Cetirizine", formulation: "tablet", price: 3.49 }),
-  item({ id: "10000000-0000-0000-0000-000000000002", product_id: P.eyeDrop, product_name: "Allergy Eye Drops", formulation: "eye_drops", price: 4.49 }),
-  item({ id: "10000000-0000-0000-0000-000000000003", product_id: P.saline, product_name: "Saline Nasal Spray", formulation: "nasal_spray", price: 3.99 }),
-  item({ id: "10000000-0000-0000-0000-000000000004", product_id: P.unrelated, product_name: "Sunscreen", formulation: "cream", price: 9.99 }),
-  item({ id: "10000000-0000-0000-0000-000000000005", product_id: P.eyeDropExpensive, product_name: "Premium Eye Drops", formulation: "eye_drops", price: 9.5, stock_status: "out_of_stock" }),
-];
-const pdgm: ProductDisplayGroupEdge[] = [
-  { product_id: P.cetirizine, display_group_id: G.tablets },
-  { product_id: P.eyeDrop, display_group_id: G.eyeDrops },
-  { product_id: P.saline, display_group_id: G.nasal },
-  { product_id: P.eyeDropExpensive, display_group_id: G.eyeDrops },
+  item({ id: "10000000-0000-0000-0000-000000000001", product_id: P.cetirizine, product_name: "Cetirizine", formulation: "tablet", price: 3.49, display_group_codes: ["tablets"] }),
+  item({ id: "10000000-0000-0000-0000-000000000002", product_id: P.eyeDrop, product_name: "Allergy Eye Drops", formulation: "eye_drops", price: 4.49, display_group_codes: ["eye-drops"] }),
+  item({ id: "10000000-0000-0000-0000-000000000003", product_id: P.saline, product_name: "Saline Nasal Spray", formulation: "nasal_spray", price: 3.99, display_group_codes: ["nasal-sprays"] }),
+  item({ id: "10000000-0000-0000-0000-000000000004", product_id: P.unrelated, product_name: "Sunscreen", formulation: "cream", price: 9.99, display_group_codes: [] }),
+  item({ id: "10000000-0000-0000-0000-000000000005", product_id: P.eyeDropExpensive, product_name: "Premium Eye Drops", formulation: "eye_drops", price: 9.5, stock_status: "out_of_stock", display_group_codes: ["eye-drops"] }),
 ];
 const catalogueVersion: CatalogueVersionMeta = {
   id: "20000000-0000-0000-0000-000000000001",
@@ -112,7 +105,6 @@ const base = {
   symptoms,
   displayGroups: groups,
   items,
-  productDisplayGroupEdges: pdgm,
   symptomDisplayGroupEdges: sdgm,
   catalogueVersion,
   generatedAt: "2026-01-03T00:00:00Z",
@@ -147,13 +139,13 @@ describe("matching engine", () => {
     const twin = item({
       id: "10000000-0000-0000-0000-00000000000A",
       product_id: "99999999-0000-0000-0000-000000000002",
-      product_name: "Allergy Eye Drops", // same name
+      product_name: "Allergy Eye Drops",
       formulation: "eye_drops",
       price: 4.49,
+      display_group_codes: ["eye-drops"],
     });
     const items2 = [...items, twin];
-    const pdgm2 = [...pdgm, { product_id: twin.product_id, display_group_id: G.eyeDrops }];
-    const r = runMatcher({ ...base, items: items2, productDisplayGroupEdges: pdgm2, request: req({ symptomIds: [S.itchyEyes] }) });
+    const r = runMatcher({ ...base, items: items2, request: req({ symptomIds: [S.itchyEyes] }) });
     const eyeMatches = r.products.filter((p) => p.product.product_name === "Allergy Eye Drops");
     expect(eyeMatches.map((m) => m.catalogue_version_item_id)).toEqual([
       "10000000-0000-0000-0000-000000000002",

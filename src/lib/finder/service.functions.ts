@@ -57,7 +57,6 @@ export const searchProducts = createServerFn({ method: "POST" })
         symptoms: snapshot.symptoms,
         displayGroups: snapshot.displayGroups,
         items: snapshot.items,
-        productDisplayGroupEdges: snapshot.productDisplayGroupEdges,
         symptomDisplayGroupEdges: snapshot.symptomDisplayGroupEdges,
         catalogueVersion: snapshot.catalogueVersion,
         generatedAt: snapshot.generatedAt,
