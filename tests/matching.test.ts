@@ -139,13 +139,13 @@ describe("matching engine", () => {
     const twin = item({
       id: "10000000-0000-0000-0000-00000000000A",
       product_id: "99999999-0000-0000-0000-000000000002",
-      product_name: "Allergy Eye Drops", // same name
+      product_name: "Allergy Eye Drops",
       formulation: "eye_drops",
       price: 4.49,
+      display_group_codes: ["eye-drops"],
     });
     const items2 = [...items, twin];
-    const pdgm2 = [...pdgm, { product_id: twin.product_id, display_group_id: G.eyeDrops }];
-    const r = runMatcher({ ...base, items: items2, productDisplayGroupEdges: pdgm2, request: req({ symptomIds: [S.itchyEyes] }) });
+    const r = runMatcher({ ...base, items: items2, request: req({ symptomIds: [S.itchyEyes] }) });
     const eyeMatches = r.products.filter((p) => p.product.product_name === "Allergy Eye Drops");
     expect(eyeMatches.map((m) => m.catalogue_version_item_id)).toEqual([
       "10000000-0000-0000-0000-000000000002",
